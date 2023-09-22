@@ -52,10 +52,10 @@ CONTENT_STYLE = {
 
 sidebar = html.Div(
     [
-        html.H2("Sidebar", className="display-4"),
+        html.H2("Dash showcase", className="display-4"),
         html.Hr(),
         html.P(
-            "A simple sidebar layout with navigation links", className="lead"
+            "A simple showcase made with Dash and Bootstrap", className="lead"
         ),
         dbc.Nav(
             [
@@ -70,16 +70,28 @@ sidebar = html.Div(
     style=SIDEBAR_STYLE,
 )
 
-svm_content = html.Div([html.Div([dcc.Markdown(svm_paragraph, mathjax=True)],
-                                 style={'float': 'left', 'margin': 'auto', 'width': '35%'}),
-                        html.Div([dcc.Graph(figure=px.scatter(df, x='SepalLength', y='SepalWidth', color="Name"), id='scatter-plot'),
-                                  html.Div([dbc.Button('Fit', id='fit-button',
-                                                       style={'float': 'right', 'margin': 'auto', 'padding': '5px 28px', "border-radius": "4px"}),
-                                            dcc.Dropdown(['Ipopt', 'CPLEX'], placeholder='Select optimizer', id='optimizer-dropdown',
-                                                         style={'float': 'right', 'margin': 'auto', 'width': '180px', "margin-right": "10px"})]
-                                           )],
-                                 style={'float': 'left', 'margin': 'auto', 'width': '45%'})],
-                       id="svm-content")
+optimizer_radio_buttons = html.Div([
+    dbc.Label("Optimizer:"),
+    dbc.RadioItems(id='optimizer-dropdown',
+                   options=[
+                       {"label": "Ipopt", "value": "Ipopt"},
+                       {"label": "CPLEX", "value": "CPLEX"},
+                   ],
+                   value="Ipopt",
+                   style={"margin-right": "10px"})
+]
+)
+
+svm_content = dbc.Row([html.Div([dcc.Markdown(svm_paragraph, mathjax=True)],
+                                style={'float': 'left'}, className="col"),
+                       html.Div([dcc.Graph(figure=px.scatter(df, x='SepalLength', y='SepalWidth', color="Name"), id='scatter-plot'),
+                                 html.Div([dbc.Button('Fit', id='fit-button',
+                                                      style={'float': 'right', 'margin': 'auto', 'padding': '5px 28px', "border-radius": "4px"}),
+                                           optimizer_radio_buttons,
+                                           ]
+                                          )],
+                                style={'float': 'left', "border-left-style": "solid", "border-left-width": "1px"}, className="col")],
+                      id="svm-content")
 content = html.Div([svm_content], style=CONTENT_STYLE, id="page-content")
 
 # App layout
@@ -121,7 +133,7 @@ def launch_optimization(n_clicks, optimizer, figure):
     svm = SVM(str.lower(optimizer))
     svm.train(X, Y)
 
-    # update plot with SVM margin and 
+    # update plot with SVM margin and
     min_y = min(df.iloc[:, 1]) - 5
     max_y = max(df.iloc[:, 1]) + 5
 

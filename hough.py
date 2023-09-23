@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import sys
 
 
-img = cv.imread('5cent.png', cv.IMREAD_GRAYSCALE)
+img = cv.imread('beer.jpg', cv.IMREAD_GRAYSCALE)
 
 img = cv.Canny(img, threshold1=100, threshold2=200)
 
@@ -27,18 +27,14 @@ angles = np.round(np.arctan2(sobely, sobelx) * (180 / np.pi))
 # plt.show()
 
 np.set_printoptions(threshold=sys.maxsize)
-print(img)
 
 edge_positions = np.transpose((img > 0).nonzero())
-print(edge_positions)
 
 centroid = np.round(np.average(edge_positions, axis=0))
 
-plt.plot(centroid[0], centroid[1], marker='+', color="red")
+plt.plot(centroid[1], centroid[0], marker='+', color="red")
 plt.imshow(img, cmap='gray')
 plt.show()
-
-print(angles)
 
 r_table = {theta: [] for theta in np.ndarray.flatten(angles)}
 
@@ -46,15 +42,10 @@ r_table = {theta: [] for theta in np.ndarray.flatten(angles)}
 for x in edge_positions:
     r_table[angles[tuple(x)]].append(centroid - x)
 
-print(r_table)
-
 ########################## TEST ##########################
 
-test_img = cv.imread('5cent_test.png', cv.IMREAD_GRAYSCALE)
+test_img = cv.imread('beer_test.jpg', cv.IMREAD_GRAYSCALE)
 test_img = cv.Canny(test_img, threshold1=100, threshold2=200)
-
-plt.imshow(test_img, cmap='gray')
-plt.show()
 
 test_sobelx = cv.Sobel(test_img, cv.CV_64F, 1, 0, ksize=5)
 test_sobely = cv.Sobel(test_img, cv.CV_64F, 0, 1, ksize=5)
@@ -64,23 +55,48 @@ test_angles = np.round(np.arctan2(test_sobely, test_sobelx) * (180 / np.pi))
 
 test_edge_positions = np.transpose((test_img > 0).nonzero())
 
-accumulator = np.zeros(test_img.shape)
 
+scaling_factors = [1.0] # np.linspace(0.5, 2.0, num=2)
+rotation_factors = [0] # [alpha for alpha in range(85, 95)]
+
+accumulator = np.zeros((test_img.shape[0], test_img.shape[1]))
 
 for x in test_edge_positions:
-    if not r_table[test_angles[tuple(x)]]:
-        continue
+    # if(np.random.uniform(0, 1) > 0.5):
+    #     continue
+    for (s, s_idx) in zip(scaling_factors, range(0, len(scaling_factors))):
+        for alpha in rotation_factors:
+            rotated_index = np.mod(test_angles[tuple(x)] - alpha, 360)
+            rotation_matrix = np.array([[np.cos(alpha), -np.sin(alpha)], [np.sin(alpha), np.cos(alpha)]])
 
-    accumulator_entries = (np.array(r_table[test_angles[tuple(x)]]) + x).astype(int)
-    # print(accumulator_entries)
-    valid_entries = accumulator_entries[((accumulator_entries[:, 0] >= 0)
+            if not np.round(rotated_index) in r_table:
+                continue
+
+            r_vectors = r_table[np.round(rotated_index)]
+            if not r_vectors:
+                continue
+
+            rotated_and_scaled_r_vectors = np.round(np.transpose(rotation_matrix.dot(np.transpose(r_vectors))) * s)
+
+            accumulator_entries = (rotated_and_scaled_r_vectors + x).astype(int)
+            valid_entries = accumulator_entries[((accumulator_entries[:, 0] >= 0)
                                          & (accumulator_entries[:, 1] >= 0)
                                          & ((accumulator_entries[:, 0] < accumulator.shape[0]))
                                          & ((accumulator_entries[:, 1] < accumulator.shape[1])))]
 
-    accumulator[valid_entries[:, 0], valid_entries[:, 1]] += 1
+            accumulator[valid_entries[:, 0], valid_entries[:, 1]] += test_magnitude[tuple(x)] + 1
+
 
 # plt.plot(centroid[0], centroid[1], marker='+', color="red")
 # print(accumulator)
-plt.imshow(accumulator, cmap='gray')
+
+max_value = np.max(accumulator)
+
+position = np.transpose((accumulator > max_value - 1).nonzero())
+
+print(position)
+
+# plt.imshow(accumulator, cmap='gray')
+plt.imshow(test_img, cmap='gray')
+plt.plot(position[0, 1], position[0, 0], marker='+', color="red")
 plt.show()

@@ -25,7 +25,7 @@ The $\\alpha_i$ terms are the lagrangian coefficients of the dual program, each 
 original hard margin SVM version is enabled.'''
 
 # Incorporate data
-df = pd.read_csv('iris.csv')
+df = pd.read_csv('assets/iris.csv')
 
 # Initialize the app
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])

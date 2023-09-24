@@ -28,7 +28,7 @@ class ImageDetector():
             return Response(self.gen(VideoCamera()),
                             mimetype='multipart/x-mixed-replace; boundary=frame')
 
-        img = cv.imread('beer_bottle.jpg', cv.IMREAD_GRAYSCALE)
+        img = cv.imread('./assets/beer_bottle.jpg', cv.IMREAD_GRAYSCALE)
 
         self.ght = cv.createGeneralizedHoughBallard()
         self.ght.setTemplate(img)

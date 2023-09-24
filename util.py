@@ -2,14 +2,14 @@ import cv2 as cv
 from flask import Flask, Response
 import numpy as np
 import matplotlib.pyplot as plt
+import constants
 
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv.VideoCapture(0)
-        # self.video = cv.VideoCapture(0, cv.CAP_DSHOW)
-        # self.video.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        # self.video.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+        self.video = cv.VideoCapture(0, cv.CAP_DSHOW)
+        self.video.set(cv.CAP_PROP_FRAME_WIDTH, constants.WEBCAM_WIDTH)
+        self.video.set(cv.CAP_PROP_FRAME_HEIGHT, constants.WEBCAM_HEIGHT)
 
     def __del__(self):
         self.video.release()
@@ -36,7 +36,7 @@ class ImageDetector():
         self.ght.setMinDist(500)
         self.ght.setLevels(360)
         self.ght.setMaxBufferSize(8192)
-        self.ght.setVotesThreshold(30)
+        self.ght.setVotesThreshold(40)
         self.ght.setCannyLowThresh(100)
         self.ght.setCannyHighThresh(200)
 
@@ -61,6 +61,7 @@ class ImageDetector():
         detection = self.ght.detect(gray_frame)
 
         if detection[0] is not None:
-            cv.circle(img=color_frame, center=(int(detection[0][0][0][0]), int(detection[0][0][0][1])), radius=150, color=(0, 0, 255), thickness=20)
+            print(detection)
+            cv.circle(img=color_frame, center=(int(detection[0][0][0][0]), int(detection[0][0][0][1])), radius=150, color=(0, 0, 255), thickness=10)
 
         return color_frame

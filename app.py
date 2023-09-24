@@ -2,25 +2,12 @@
 from dash import Dash, html, dcc, Input, Output, page_registry, page_container
 import dash_bootstrap_components as dbc
 from flask import Flask, Response
-from util import VideoCamera
+from util import VideoCamera, ImageDetector
 
 
 # Initialize the app
 server = Flask(__name__)
-
-
-def gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-
-@server.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
+image_detector = ImageDetector(server)
 
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], use_pages=True, server=server)
 

@@ -33,10 +33,10 @@ class ImageDetector():
         self.ght = cv.createGeneralizedHoughBallard()
         self.ght.setTemplate(img)
 
-        self.ght.setMinDist(500)
+        self.ght.setMinDist(10)
         self.ght.setLevels(360)
         self.ght.setMaxBufferSize(8192)
-        self.ght.setVotesThreshold(40)
+        self.ght.setVotesThreshold(60)
         self.ght.setCannyLowThresh(100)
         self.ght.setCannyHighThresh(200)
 

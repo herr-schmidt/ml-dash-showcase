@@ -23,7 +23,9 @@ $$
 $$
 \
 The $\\alpha_i$ terms are the lagrangian coefficients of the dual program, each one for every input vector $\\bar x_i$; the $y_i$ terms represent the true class ($+1$ or $-1$) of each input instance. Finally, the penalization constant $C$ is used for allowing training when input samples happen to be not linearly separable (soft margin approach). As $C$ approaches infinity, the 
-original hard margin SVM version is enabled.'''
+original hard margin SVM version is enabled.
+
+By pressing on the “Fit” button in the panel on the right, you can train a model for the famous Iris dataset. The underlying implementation is based on the above convex mathematical program, defined by means of Pyomo, which allows for various solvers to be used for the actual resolution (Ipopt and CPLEX are available here, but many more are supported). After fitting has been performed, you should see the margin appear in the scatter plot.'''
 
 # Incorporate data
 df = pd.read_csv('assets/iris.csv')

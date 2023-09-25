@@ -110,14 +110,15 @@ image_table = create_image_table()
 
 image_table_div = html.Div(image_table, id="image-table-div")
 
-infer_button = dbc.Button("Predict", style={"width": "80px"}, id="infer-button")
+infer_button = dbc.Button("Predict", style={"width": "100px"}, id="infer-button")
 button_row = dbc.Row([infer_button], style={"display": "flex",
-                                            "justify-content": "space-evenly"})
+                                            "justify-content": "space-evenly",
+                                            "padding-top": "40px"})
 
 final_paragraph = """## Making inference
-You can try an inference on a loaded Keras model...
+You can try an inference on the images below using a pretrained Keras model by clicking the “Predict” button below. Wait a few seconds and see how it behaves!
 """
 
-final_paragraph_div = html.Div([dcc.Markdown(final_paragraph, dangerously_allow_html=True)])
+final_paragraph_div = html.Div([dcc.Markdown(final_paragraph, dangerously_allow_html=True, style={"padding-bottom": "40px"})])
 
 layout = html.Div([first_row, html.Hr(), final_paragraph_div, image_table_div, button_row])

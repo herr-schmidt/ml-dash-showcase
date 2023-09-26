@@ -16,7 +16,6 @@ class SVM:
         self.support_vectors_Y = []
         self.lagrange_coefficients = []
 
-
     def define_training_set_cardinality(self, model):
         model.I = pyo.Param(within=pyo.PositiveIntegers)
 
@@ -114,7 +113,7 @@ class SVM:
                 self.support_vectors.append(X[i - 1])
                 self.support_vectors_Y.append(targets[i])
                 self.lagrange_coefficients.append(self.model_instance.alpha[i].value)
-        
+
         # average for numerical accuracy
         for i in range(len(self.support_vectors)):
             self.b += self.support_vectors_Y[i] - np.dot(self.w, self.support_vectors[i])
@@ -128,14 +127,14 @@ class SVM:
                 predictions.append(1)
             else:
                 predictions.append(-1)
-        
+
         return predictions
-    
+
     def score(self, X, y):
         predictions = self.predict(X)
         tp_tn = 0
         for i in range(len(predictions)):
             if predictions[i] == y[i]:
                 tp_tn += 1
-        
+
         return tp_tn / len(predictions)

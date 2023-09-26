@@ -36,7 +36,7 @@ class ImageDetector():
         self.ght.setMinDist(10)
         self.ght.setLevels(360)
         self.ght.setMaxBufferSize(8192)
-        self.ght.setVotesThreshold(60)
+        self.ght.setVotesThreshold(35)
         self.ght.setCannyLowThresh(100)
         self.ght.setCannyHighThresh(200)
 

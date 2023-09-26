@@ -2,38 +2,16 @@ from dash import html, dcc, callback, Input, Output, register_page
 import tensorflow as tf
 from PIL import Image
 from io import BytesIO
-from constants import Classes
+from constants import Classes, cnn_intro_paragraph, cnn_inference_paragraph, RIGHT_INFERENCE, WRONG_INFERENCE, UNKNOWN
 import base64
 import dash_bootstrap_components as dbc
 
 register_page(__name__, title="Convolutional neural networks")
 
-paragraph = """## Convolutional neural networks
-
-Convolutional Neural Networks (CNNs) are a particular type of neural network inspired by the way visual cortices behave in some mammals - as studied, for instance, in the 1959 paper *“Receptive fields of single neurones in the cat's striate cortex”* by David Hubel and Torsten Wiesel. CNNs proved to be particularly effective, among other things, in the field of Computer Vision, where they are employed in a wide variety of tasks such as image classification, image segmentation, object detection.
-
-The use of convolutional filters allows for the utilization of the whole information available along the two dimensions (or more, if other channels other than intensity are involved) of an image.
-
-The graph on the left represents a CNN built and trained on the CIFAR-10 dataset by the Tensorflow module named Keras. As one can see, CNNs can reach a considerable depth...
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/>
-#### Deep indeed.
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-<br/><br/><br/>
-#### *Very* deep."""
-
-###################################
-
 
 def create_image_table(tag_list=None, rows=5, columns=10):
     if not tag_list:
-        tag_list = [unknown] * (rows * columns)
+        tag_list = [UNKNOWN] * (rows * columns)
 
     image_rows = []
 
@@ -48,17 +26,16 @@ def create_image_table(tag_list=None, rows=5, columns=10):
 
             image_data = base64.b64encode(im_data)
             if not isinstance(image_data, str):
-                # Python 3, decode from bytes to string
                 image_data = image_data.decode()
             data_url = 'data:image/jpg;base64,' + image_data
 
-            image_component = html.Div([html.Img(src=data_url, style={"border-radius": "5px"}), html.Label(tag_list[row * columns + column])], style={"display": "flex",
-                                                                                                                                                      "flex-direction": "column",
-                                                                                                                                                      "align-items": "center"}, className="col")
-
+            image_component = html.Div([html.Img(src=data_url, style={"border-radius": "5px"}),
+                                        html.Label(tag_list[row * columns + column])], style={"display": "flex",
+                                                                                              "flex-direction": "column",
+                                                                                              "align-items": "center"}, className="col")
             images.append(image_component)
 
-        html_row = dbc.Row(images)
+        html_row = dbc.Row(images, style={"padding-bottom": "15px"})
         image_rows.append(html_row)
 
     return html.Div(image_rows, id="image-table")
@@ -70,9 +47,6 @@ _, (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 assert x_test.shape == (10000, 32, 32, 3)
 assert y_test.shape == (10000, 1)
 
-wrong = "❌"
-right = "✅"
-unknown = "❔"
 
 ###########################################
 
@@ -92,9 +66,9 @@ def display_output(n_clicks):
     for i in range(len(prediction_vectors)):
         predicted_class = prediction_vectors[i].argmax()
         if(predicted_class == y_test[i]):
-            labels.append(str.capitalize(str.lower(Classes(predicted_class).name)) + " " + right)
+            labels.append(str.capitalize(str.lower(Classes(predicted_class).name)) + " " + RIGHT_INFERENCE)
         else:
-            labels.append(str.capitalize(str.lower(Classes(predicted_class).name)) + " " + wrong)
+            labels.append(str.capitalize(str.lower(Classes(predicted_class).name)) + " " + WRONG_INFERENCE)
 
     image_table = create_image_table(tag_list=labels)
 
@@ -104,7 +78,7 @@ def display_output(n_clicks):
 
 
 first_row = dbc.Row([html.Img(src="assets/cnn_model.svg", className="col", style={"max-width": "39.75%", "padding-top": "48px"}),
-                     html.Div([dcc.Markdown(paragraph, mathjax=True, dangerously_allow_html=True)], className="col")])
+                     html.Div([dcc.Markdown(cnn_intro_paragraph, mathjax=True, dangerously_allow_html=True)], className="col")])
 
 image_table = create_image_table()
 
@@ -115,10 +89,7 @@ button_row = dbc.Row([infer_button], style={"display": "flex",
                                             "justify-content": "space-evenly",
                                             "padding-top": "40px"})
 
-final_paragraph = """## Making inference
-You can try an inference on the images below using a pretrained Keras model by clicking the “Predict” button below. Wait a few seconds and see how it behaves!
-"""
 
-final_paragraph_div = html.Div([dcc.Markdown(final_paragraph, dangerously_allow_html=True, style={"padding-bottom": "40px"})])
+final_paragraph_div = html.Div([dcc.Markdown(cnn_inference_paragraph, dangerously_allow_html=True, style={"padding-bottom": "40px"})])
 
 layout = html.Div([first_row, html.Hr(), final_paragraph_div, image_table_div, button_row])

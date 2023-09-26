@@ -1,8 +1,8 @@
 # Import packages
-from dash import Dash, html, dcc, Input, Output, page_registry, page_container
+from dash import Dash, html, page_registry, page_container
 import dash_bootstrap_components as dbc
-from flask import Flask, Response
-from util import VideoCamera, ImageDetector
+from flask import Flask
+from util import ImageDetector
 
 
 # Initialize the app
